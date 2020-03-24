@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.9
+FROM alpine:3.11
 MAINTAINER Timothy St. Clair "tstclair@heptio.com"  
 
 WORKDIR /app
