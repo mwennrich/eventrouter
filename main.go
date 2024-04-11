@@ -38,7 +38,7 @@ import (
 // addr tells us what address to have the Prometheus metrics listen on.
 var addr = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
 
-// setup a signal hander to gracefully exit
+// setup a signal handler to gracefully exit
 func sigHandler() <-chan struct{} {
 	stop := make(chan struct{})
 	go func() {
@@ -74,6 +74,7 @@ func loadConfig() kubernetes.Interface {
 	viper.SetDefault("sink", "glog")
 	viper.SetDefault("resync-interval", time.Minute*30)
 	viper.SetDefault("enable-prometheus", true)
+	viper.SetDefault("skip-event-updates", false)
 	if err = viper.ReadInConfig(); err != nil {
 		panic(err.Error())
 	}
@@ -118,8 +119,9 @@ func main() {
 	sharedInformers := informers.NewSharedInformerFactory(clientset, viper.GetDuration("resync-interval"))
 	eventsInformer := sharedInformers.Core().V1().Events()
 
+	skipEventUpdates := viper.GetBool("skip-event-updates")
 	// TODO: Support locking for HA https://github.com/kubernetes/kubernetes/pull/42666
-	eventRouter := NewEventRouter(clientset, eventsInformer)
+	eventRouter := NewEventRouter(clientset, eventsInformer, skipEventUpdates)
 	stop := sigHandler()
 
 	// Startup the http listener for Prometheus Metrics endpoint.

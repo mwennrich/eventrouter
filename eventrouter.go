@@ -90,10 +90,13 @@ type EventRouter struct {
 	// event sink
 	// TODO: Determine if we want to support multiple sinks.
 	eSink sinks.EventSinkInterface
+
+	// skipEventUpdates will skip updating events in the sink
+	skipEventUpdates bool
 }
 
 // NewEventRouter will create a new event router using the input params
-func NewEventRouter(kubeClient kubernetes.Interface, eventsInformer coreinformers.EventInformer) *EventRouter {
+func NewEventRouter(kubeClient kubernetes.Interface, eventsInformer coreinformers.EventInformer, skipEventUpdates bool) *EventRouter {
 	if viper.GetBool("enable-prometheus") {
 		prometheus.MustRegister(kubernetesWarningEventCounterVec)
 		prometheus.MustRegister(kubernetesNormalEventCounterVec)
@@ -102,8 +105,9 @@ func NewEventRouter(kubeClient kubernetes.Interface, eventsInformer coreinformer
 	}
 
 	er := &EventRouter{
-		kubeClient: kubeClient,
-		eSink:      sinks.ManufactureSink(),
+		kubeClient:       kubeClient,
+		eSink:            sinks.ManufactureSink(),
+		skipEventUpdates: skipEventUpdates,
 	}
 	_, err := eventsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    er.addEvent,
@@ -145,7 +149,9 @@ func (er *EventRouter) updateEvent(objOld interface{}, objNew interface{}) {
 	eOld := objOld.(*v1.Event)
 	eNew := objNew.(*v1.Event)
 	prometheusEvent(eNew)
-	er.eSink.UpdateEvents(eNew, eOld)
+	if !er.skipEventUpdates {
+		er.eSink.UpdateEvents(eNew, eOld)
+	}
 }
 
 // prometheusEvent is called when an event is added or updated
