@@ -1,5 +1,5 @@
 
-FROM golang:1.24 as builder
+FROM golang:1.25 AS builder
 ENV GO111MODULE=on
 ENV CGO_ENABLED=0
 
