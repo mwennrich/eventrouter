@@ -138,14 +138,14 @@ func (er *EventRouter) Run(stopCh <-chan struct{}) {
 }
 
 // addEvent is called when an event is created, or during the initial list
-func (er *EventRouter) addEvent(obj interface{}) {
+func (er *EventRouter) addEvent(obj any) {
 	e := obj.(*v1.Event)
 	prometheusEvent(e)
 	er.eSink.UpdateEvents(e, nil)
 }
 
 // updateEvent is called any time there is an update to an existing event
-func (er *EventRouter) updateEvent(objOld interface{}, objNew interface{}) {
+func (er *EventRouter) updateEvent(objOld any, objNew any) {
 	eOld := objOld.(*v1.Event)
 	eNew := objNew.(*v1.Event)
 	prometheusEvent(eNew)
@@ -206,7 +206,7 @@ func prometheusEvent(event *v1.Event) {
 }
 
 // deleteEvent should only occur when the system garbage collects events via TTL expiration
-func (er *EventRouter) deleteEvent(obj interface{}) {
+func (er *EventRouter) deleteEvent(obj any) {
 	e := obj.(*v1.Event)
 	// NOTE: This should *only* happen on TTL expiration there
 	// is no reason to push this to a sink

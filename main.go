@@ -138,11 +138,9 @@ func main() {
 	}
 
 	// Startup the EventRouter
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		eventRouter.Run(stop)
-	}()
+	})
 
 	// Startup the Informer(s)
 	glog.Infof("Starting shared Informer(s)")
