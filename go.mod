@@ -9,9 +9,9 @@ require (
 	github.com/nytlabs/gojsonexplode v0.0.0-20200518202627-78c8f38f2dac
 	github.com/prometheus/client_golang v1.24.1
 	github.com/spf13/viper v1.21.0
-	k8s.io/api v0.37.0
-	k8s.io/apimachinery v0.37.0
-	k8s.io/client-go v0.37.0
+	k8s.io/api v0.37.1
+	k8s.io/apimachinery v0.37.1
+	k8s.io/client-go v0.37.1
 )
 
 require (
